@@ -3,17 +3,13 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from engine import JukirRaceEngine, alpha_beta
 
-ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
-app = Flask(__name__, static_folder=None)
+app = Flask(__name__)
 CORS(app)
 
-@app.route('/')
-def home():
-    return send_from_directory(ROOT_DIR, 'index.html')
 
 def state_to_dict(engine):
     return {
@@ -27,6 +23,7 @@ def state_to_dict(engine):
         "winner": engine.winner() if engine.is_terminal() else None
     }
 
+
 def dict_to_engine(data):
     b = data.get('board', {})
     engine = JukirRaceEngine(b.get('width', 6), b.get('height', 6))
@@ -38,11 +35,13 @@ def dict_to_engine(data):
     engine.piece_count = data.get('pieceCount', {'V': 0, 'H': 0})
     return engine
 
+
 @app.route('/api/game/new', methods=['POST'])
 def new_game():
     data = request.json or {}
     engine = JukirRaceEngine(data.get('width', 6), data.get('height', 6))
     return jsonify(state_to_dict(engine))
+
 
 @app.route('/api/game/move', methods=['POST'])
 def player_move():
@@ -51,27 +50,27 @@ def player_move():
     ptype = data.get('pieceType')
     x = data.get('x')
     y = data.get('y')
-    
-    # Validasi & apply manual move
+
     moves = engine.get_valid_moves(engine.turn)
     if (ptype, x, y) in moves:
         engine.apply_move(engine.turn, ptype, x, y)
     else:
         return jsonify({"error": "Invalid move"}), 400
-        
+
     return jsonify(state_to_dict(engine))
+
 
 @app.route('/api/game/ai-move', methods=['POST'])
 def ai_move():
     data = request.json or {}
     engine = dict_to_engine(data.get('state', {}))
     depth = data.get('depth', 4)
-    
+
     stats = {'nodes': 0}
     score, best_move = alpha_beta(
         engine, depth, float('-inf'), float('inf'), engine.turn == 'V', stats
     )
-    
+
     if best_move:
         engine.apply_move(engine.turn, best_move[0], best_move[1], best_move[2])
     else:
@@ -84,6 +83,7 @@ def ai_move():
         "nodesEvaluated": stats['nodes'],
         "newState": state_to_dict(engine)
     })
+
 
 if __name__ == '__main__':
     app.run(port=5328, debug=True)
