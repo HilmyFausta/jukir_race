@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jukir Race</title>
+  <style>
+    :root { color-scheme: dark; --blue:#2463eb; --red:#d83a34; --panel:#171a20; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; font-family:Inter,system-ui,sans-serif; color:#f7f7f7; background:radial-gradient(circle at 50% 0,#343a48,#111318 65%); }
+    .app { max-width:1180px; margin:auto; padding:20px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    h1 { margin:0; font-size:clamp(24px,4vw,42px); letter-spacing:.05em; }
+    h1 span:first-child { color:#77a8ff; } h1 span:last-child { color:#ff766f; }
+    .controls { display:flex; gap:8px; flex-wrap:wrap; }
+    button, select { border:1px solid #434a58; background:#242831; color:white; border-radius:10px; padding:10px 12px; font-weight:700; }
+    button { cursor:pointer; } button:hover { filter:brightness(1.12); } button.active { outline:3px solid #fff; outline-offset:-3px; }
+    main { display:grid; grid-template-columns:220px minmax(320px,720px) 220px; gap:16px; align-items:start; }
+    .brand { min-height:500px; border-radius:18px; padding:14px; border:4px solid; background:linear-gradient(160deg,#202733,#101318); text-align:center; }
+    .brand.v { border-color:var(--blue); } .brand.h { border-color:var(--red); }
+    .brand-name { font-weight:900; font-size:20px; margin-bottom:18px; } .brand.v .brand-name { color:#79a7ff; } .brand.h .brand-name { color:#ff8179; }
+    .storefront { height:90px; border-radius:10px 10px 4px 4px; border:3px solid currentColor; display:grid; place-items:center; color:inherit; margin-bottom:16px; box-shadow:inset 0 -20px rgba(0,0,0,.15); }
+    .brand.v .storefront { color:#4d86f5; } .brand.h .storefront { color:#eb554f; }
+    .stat { padding:10px; margin-top:10px; border-radius:10px; background:#ffffff0b; }
+    .stat strong { display:block; font-size:22px; }
+    .board-wrap { position:relative; }
+    #board { width:100%; aspect-ratio:1; display:grid; gap:0; border:12px solid #b7a98e; border-radius:12px; overflow:hidden; background-color:#aaa58f; box-shadow:0 18px 40px rgba(0,0,0,.35); }
+    .tile { background-color:#aaa58f; border-right:1px solid rgba(96,91,75,.28); border-bottom:1px solid rgba(96,91,75,.28); position:relative; }
+    .tile:nth-child(4n+1), .tile:nth-child(4n+4) { background:linear-gradient(135deg,rgba(255,255,255,.08),transparent),#b2ad98; }
+    .obstacle { z-index:3; width:68%; height:68%; margin:auto; border-radius:50%; background:radial-gradient(circle at 35% 30%,#777,#222 55%,#111); border:3px dotted #777; }
+    .piece { z-index:4; display:flex; align-items:center; justify-content:center; margin:6%; border-radius:7px; color:white; font-size:11px; font-weight:900; box-shadow:inset 0 -5px rgba(0,0,0,.18),0 5px 10px rgba(0,0,0,.25); pointer-events:none; }
+    .piece.V { background:#2463eb; border:2px solid #70a0ff; } .piece.H { background:#d83a34; border:2px solid #ff8983; }
+    .piece::before { content:'◆'; font-size:clamp(14px,2vw,26px); }
+    .piece.motor { border-radius:50px 7px 7px 50px; } .piece.mobil { border-radius:8px; }
+    #status { text-align:center; margin:12px 0 0; min-height:26px; font-weight:800; }
+    #gameOver { position:absolute; inset:12px; z-index:10; display:none; place-items:center; border-radius:8px; background:#1118; backdrop-filter:blur(4px); }
+    #gameOver div { padding:24px; border-radius:14px; background:#171a20; border:2px solid #aaa; text-align:center; }
+    @media(max-width:900px) { main{grid-template-columns:1fr} .brand{min-height:auto; display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px} .brand-name,.storefront{margin:0}.brand{order:2}.board-wrap{order:1}.brand.h{order:3} }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1><span>Indo</span><span>Park</span></h1>
+    <div class="controls">
+      <select id="size"><option value="6">6 × 6</option><option value="8" selected>8 × 8</option><option value="10">10 × 10</option></select>
+      <select id="mode"><option value="pvai">Player vs Agent</option><option value="pvp">Player vs Player</option><option value="avav">Agent vs Agent</option></select>
+      <button id="motor" class="active">Motor · Rp2K</button>
+      <button id="mobil">Mobil · Rp3K</button>
+      <button id="newGame">Game Baru</button>
+    </div>
+  </header>
+  <main>
+    <aside class="brand v"><div class="brand-name">INDOPARK</div><div class="storefront">STORE</div><div class="stat">Tarif<strong id="tarifV">Rp0</strong></div><div class="stat">Motor / Mobil<strong id="quotaV">0 / 0</strong></div></aside>
+    <section class="board-wrap"><div id="board"></div><div id="status">Memuat...</div><div id="gameOver"><div><h2 id="winnerText"></h2><button onclick="newGame()">Main Lagi</button></div></div></section>
+    <aside class="brand h"><div class="brand-name">ALFAPARK</div><div class="storefront">STORE</div><div class="stat">Tarif<strong id="tarifH">Rp0</strong></div><div class="stat">Motor / Mobil<strong id="quotaH">0 / 0</strong></div></aside>
+  </main>
+</div>
+<script>
+let state = null, selectedType = 'motor', busy = false, mode = 'pvai', aiTimer = null;
+const boardEl = document.getElementById('board');
+const money = n => 'Rp' + Number(n).toLocaleString('id-ID');
+function setType(type) { selectedType=type; document.getElementById('motor').classList.toggle('active',type==='motor'); document.getElementById('mobil').classList.toggle('active',type==='mobil'); }
+document.getElementById('motor').onclick=()=>setType('motor'); document.getElementById('mobil').onclick=()=>setType('mobil');
+document.getElementById('newGame').onclick=newGame;
+async function newGame(){ clearTimeout(aiTimer); busy=false; mode=document.getElementById('mode').value; const size=+document.getElementById('size').value; const r=await fetch('/api/game/new',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({width:size,height:size,mode})}); state=await r.json(); document.getElementById('gameOver').style.display='none'; render(); if(mode==='avav')scheduleAI(); }
+function hasValidMove(player,type){ if(!state)return false; const quota=state.quota[player]; if(quota[type]<=0)return false; const size=type==='motor'?2:3, cells=state.board.cells; for(let y=0;y<state.board.height;y++)for(let x=0;x<state.board.width;x++){let ok=true;if(player==='V'){if(y+size>state.board.height)continue;for(let i=0;i<size;i++)if(cells[y+i][x]!=null)ok=false}else{if(x+size>state.board.width)continue;for(let i=0;i<size;i++)if(cells[y][x+i]!=null)ok=false}if(ok)return true}return false }
+async function onCellClick(x,y){ if(busy||!state||state.terminal)return; if(mode==='pvai'&&state.turn==='H')return; if(!hasValidMove(state.turn,selectedType)){return;} busy=true; const r=await fetch('/api/game/move',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({state,pieceType:selectedType,x,y})}); const result=await r.json(); if(result.error){busy=false;return;} state=result; render(); busy=false; scheduleAI(); }
+async function scheduleAI(){ if(!state||state.terminal)return; const aiTurn=(mode==='pvai'&&state.turn==='H')||(mode==='avav'); if(!aiTurn)return; busy=true; document.getElementById('status').textContent='AI sedang berpikir...'; aiTimer=setTimeout(async()=>{const r=await fetch('/api/game/ai-move',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({state,depth:document.getElementById('size').value==='10'?3:4})}); const result=await r.json(); state=result.newState; busy=false; render(); if(!state.terminal&&((mode==='pvai'&&state.turn==='H')||mode==='avav'))aiTimer=setTimeout(scheduleAI,350);},350); }function render(){ const w=state.board.width,h=state.board.height; boardEl.style.gridTemplateColumns=`repeat(${w},1fr)`; boardEl.style.gridTemplateRows=`repeat(${h},1fr)`; boardEl.innerHTML=''; for(let y=0;y<h;y++)for(let x=0;x<w;x++){const cell=document.createElement('div'); cell.className='tile'; cell.style.gridColumn=x+1; cell.style.gridRow=y+1; cell.onclick=()=>onCellClick(x,y); boardEl.appendChild(cell);}
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const value=state.board.cells[y][x]; if(value==='OBSTACLE'){const el=document.createElement('div');el.className='obstacle';el.style.gridColumn=x+1;el.style.gridRow=y+1;el.style.display='grid';boardEl.appendChild(el)}else if(value&&value.type){if(state.turn&&state.board.cells[y][x]&&((value.owner==='V'&&y===0)||(value.owner==='H'&&x===0))){/* no-op */}const size=value.type==='motor'?2:3;let start=true; for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++){if(state.board.cells[yy][xx]===value){start=(xx===x&&yy===y);break}} /* object references may differ but serialized objects are separate */ }
+  }
+  // Draw occupied blocks once by detecting owner/type runs.
+  const drawn=new Set(); for(let y=0;y<h;y++)for(let x=0;x<w;x++){const value=state.board.cells[y][x]; if(!value||typeof value==='string')continue;const key=`${value.owner}-${value.type}-${y}-${x}`; if(drawn.has(key))continue;const size=value.type==='motor'?2:3;let start=true;if(value.owner==='V'){if(y>0&&state.board.cells[y-1][x]?.owner===value.owner&&state.board.cells[y-1][x]?.type===value.type)start=false}else{if(x>0&&state.board.cells[y][x-1]?.owner===value.owner&&state.board.cells[y][x-1]?.type===value.type)start=false}if(!start)continue;const el=document.createElement('div');el.className=`piece ${value.owner} ${value.type}`;if(value.owner==='V'){el.style.gridColumn=x+1;el.style.gridRow=`${y+1} / span ${size}`}else{el.style.gridColumn=`${x+1} / span ${size}`;el.style.gridRow=y+1}boardEl.appendChild(el);drawn.add(key);}
+  document.getElementById('tarifV').textContent=money(state.tarif.V); document.getElementById('tarifH').textContent=money(state.tarif.H); document.getElementById('quotaV').textContent=`${state.quota.V.motor} / ${state.quota.V.mobil}`; document.getElementById('quotaH').textContent=`${state.quota.H.motor} / ${state.quota.H.mobil}`;
+  const playerName=state.turn==='V'?'IndoPark (biru)':'AlfaPark (merah)'; document.getElementById('status').textContent=state.terminal?`Permainan selesai`:`Giliran ${playerName}`;
+  if(state.terminal){const text=state.winner==='TIE'?'Seri!':`${state.winner==='V'?'IndoPark':'AlfaPark'} menang!`;document.getElementById('winnerText').textContent=text;document.getElementById('gameOver').style.display='grid';}
+}
+newGame();
+</script>
+</body>
+</html>
