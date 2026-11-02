@@ -59,12 +59,31 @@ def player_move():
 
     return jsonify(state_to_dict(engine))
 
+@app.route('/api/game/skip', methods=['POST'])
+def skip_turn():
+    data = request.json or {}
+    engine = dict_to_engine(data.get('state', {}))
+    engine.consecutive_skips += 1
+    engine.turn = 'H' if engine.turn == 'V' else 'V'
+    return jsonify(state_to_dict(engine))
+
 
 @app.route('/api/game/ai-move', methods=['POST'])
 def ai_move():
     data = request.json or {}
     engine = dict_to_engine(data.get('state', {}))
     depth = data.get('depth', 4)
+
+    moves = engine.get_valid_moves(engine.turn)
+    if not moves:                       # <-- tambahan: cek dulu sebelum search
+        engine.consecutive_skips += 1
+        engine.turn = 'H' if engine.turn == 'V' else 'V'
+        return jsonify({
+            "move": None,
+            "score": None,
+            "nodesEvaluated": 0,
+            "newState": state_to_dict(engine)
+        })
 
     stats = {'nodes': 0}
     score, best_move = alpha_beta(
