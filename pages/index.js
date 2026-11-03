@@ -143,7 +143,7 @@ export default function Home() {
             className={pieceType === "motor" ? "active" : ""}
             onClick={() => setPieceType("motor")}
           >
-            Motor &middot; Rp2K
+            Sepeda Motor &middot; Rp2K
           </button>
           <button
             className={pieceType === "mobil" ? "active" : ""}
