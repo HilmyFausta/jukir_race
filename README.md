@@ -1,42 +1,31 @@
 # Jukir Race
 
-Baseline implementasi (Next.js + Phaser + Python/Flask) sesuai PRD.md.
-Logic AI (engine.py) dipakai dari repo tim, tidak diubah - hanya dibungkus
-ulang dengan frontend Next.js+Phaser dan dirapikan untuk deploy Vercel.
+Game KKA (Adversarial Search): Indoapril vs Betamart. Next.js + Phaser (frontend), Python/Flask (AI minimax + alpha-beta) di Vercel.
+Aturan dan arsitektur lengkap ada di `PRD.md`.
 
-## Jalankan lokal (disarankan: Vercel CLI, biar frontend+backend jalan bareng)
-```
-npm install -g vercel   # kalau belum ada
-npm install
-pip install -r requirements.txt
-vercel dev
-```
-Buka http://localhost:3000
-
-## Jalankan manual (alternatif, 2 terminal terpisah)
-Terminal 1 (frontend):
+## Jalankan lokal
+Cara paling gampang (frontend + backend jalan bareng seperti di production):
 ```
 npm install
-npm run dev
+pip install -r requirements.txt      # aktifkan .venv dulu
+npm install -g vercel                # sekali saja
+vercel dev                           # buka http://localhost:3000
 ```
-Terminal 2 (backend, untuk endpoint /api/*):
+Alternatif 2 terminal:
 ```
-pip install -r requirements.txt
-python api/index.py
+# terminal 1
+pip install -r requirements.txt && python api/index.py     # Flask di :5328
+# terminal 2
+npm install && npm run dev                                  # /api/* otomatis di-proxy ke :5328 (lihat next.config.js)
 ```
-Lalu set proxy di next.config.js (rewrites ke http://localhost:5328) kalau mau
-kedua server jalan terpisah - atau langsung pakai `vercel dev` saja (lebih simpel).
 
-## Deploy ke Vercel
-Push ke GitHub lalu import project di Vercel seperti biasa. `vercel.json` sudah
-mengatur build Next.js + Python API dalam satu project.
+## Tes engine
+```
+python -m unittest tests/test_engine.py
+```
 
-## Struktur
-- `engine.py`, `test_engine.py` - logic game & AI (Minimax + Alpha-Beta), tidak berubah dari versi tim.
-- `api/index.py` - Flask API, jadi serverless function Python di Vercel.
-- `pages/`, `components/`, `styles/` - frontend Next.js + Phaser.
-- `public/assets/` - placeholder sprite (vehicles.png, paving.png/paving_tile.png) dari referensi desain; ganti dengan hasil export Aseprite final.
+## Deploy
+Push ke GitHub; project Vercel yang sudah tersambung akan build otomatis (`vercel.json` mengatur Next.js + Python).
 
-## Yang masih placeholder
-- Vehicle/obstacle di board digambar prosedural pakai Phaser Graphics (warna + bentuk sederhana), bukan sprite final. Begitu asset Aseprite jadi, tinggal load sebagai texture di `components/GameBoard.js` (ganti bagian `piecesLayer` graphics jadi `this.add.image(...)`).
-- Tarif, jatah blok, formula obstacle sudah sesuai PRD tapi tetap kandidat untuk di-tuning saat playtest (lihat PRD.md poin 9).
+## Catatan migrasi dari versi sebelumnya
+File yang sudah tidak dipakai dan boleh dihapus dari repo: `konsep_game.md`, `index.html` (lama), `public/assets/vehicles.png`, `public/assets/paving.png`.
