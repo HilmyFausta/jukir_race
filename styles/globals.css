@@ -635,6 +635,29 @@ button {
   line-height: 1.8;
   opacity: 0.85;
 }
+.demo-controls {
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  gap: 8px;
+  margin-top: 10px;
+}
+.demo-controls label {
+  display: grid;
+  gap: 3px;
+  color: #b7c0e8;
+  font-size: 7px;
+  text-align: left;
+}
+.demo-controls select {
+  min-width: 62px;
+  padding: 8px 6px;
+  color: #fff;
+  background: #252b4a;
+  border: 3px solid #000;
+  font-family: inherit;
+  font-size: 8px;
+}
 .demo-grid {
   max-width: 1100px;
   margin: 0 auto;
@@ -688,6 +711,10 @@ button {
   font-size: 7px;
   line-height: 1.6;
   text-align: center;
+}
+.demo-total {
+  grid-column: 1 / -1;
+  color: var(--yellow);
 }
 .tree-edge {
   stroke: #72799d;
