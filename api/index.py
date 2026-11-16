@@ -65,5 +65,21 @@ def ai_move():
     return jsonify({"move": {"r": move.r, "c": move.c, "h": move.h, "w": move.w}, "info": info})
 
 
+@app.route('/api/game/visualize', methods=['POST'])
+def visualize():
+    """Return a bounded search tree for the current position."""
+    data = request.get_json(silent=True) or {}
+    state = data.get('state') or {}
+    n = clamp(state.get('n', 6), MIN_N, MAX_N, 6)
+    depth = clamp(data.get('depth', 3), 1, 4, 3)
+    width = clamp(data.get('width', 4), 1, 6, 4)
+    engine = data.get('engine', 'alphabeta')
+    if engine not in ('minimax', 'alphabeta'):
+        engine = 'alphabeta'
+    mask = mask_of(n, state.get('obstacles', []), state.get('pieces', []))
+    solver = Solver(n, budget=50_000, time_limit=8)
+    return jsonify(solver.trace_search(mask, depth, width, engine))
+
+
 if __name__ == '__main__':
     app.run(port=5328, debug=True)

@@ -531,6 +531,168 @@ button {
   text-align: center;
 }
 
+/* ---------- SEARCH TREE ---------- */
+.tree-panel {
+  width: 100%;
+  padding: 12px;
+  background: #171b32;
+  border-color: #000;
+  box-shadow: inset -4px -4px 0 rgba(0, 0, 0, 0.35), inset 4px 4px 0 rgba(255, 255, 255, 0.08), 5px 5px 0 rgba(0, 0, 0, 0.35);
+}
+.tree-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 8px;
+}
+.tree-heading h2 {
+  margin: 0;
+  color: var(--yellow);
+  font-size: 10px;
+}
+.tree-heading p,
+.tree-empty,
+.tree-stats {
+  margin: 5px 0 0;
+  font-size: 8px;
+  line-height: 1.8;
+  opacity: 0.8;
+}
+.tree-badge {
+  border: 2px solid var(--yellow);
+  color: var(--yellow);
+  padding: 4px 5px;
+  font-size: 7px;
+  white-space: nowrap;
+}
+.tree-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+  margin-top: 10px;
+}
+.tree-controls label {
+  display: grid;
+  gap: 3px;
+  color: #b7c0e8;
+  font-size: 7px;
+}
+.tree-controls select {
+  min-width: 62px;
+  padding: 8px 6px;
+  color: #fff;
+  background: #252b4a;
+  border: 3px solid #000;
+  font-family: inherit;
+  font-size: 8px;
+}
+.tree-slider {
+  display: block;
+  width: 100%;
+  margin: 12px 0 3px;
+  accent-color: var(--yellow);
+}
+.tree-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin-top: 8px;
+  padding: 8px;
+  background: #0c1021;
+  border: 3px solid #000;
+  overscroll-behavior-x: contain;
+}
+.tree-svg {
+  display: block;
+  min-width: 720px;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+.tree-edge {
+  stroke: #72799d;
+  stroke-width: 2;
+  opacity: 0.8;
+}
+.tree-edge.cut {
+  stroke: var(--red);
+  stroke-dasharray: 6 4;
+  opacity: 0.65;
+}
+.tree-shape {
+  stroke: #000;
+  stroke-width: 3;
+}
+.tree-shape.max {
+  fill: var(--blue);
+}
+.tree-shape.min {
+  fill: var(--red);
+}
+.tree-shape.cut {
+  stroke: var(--yellow);
+  stroke-dasharray: 5 3;
+}
+.tree-value {
+  fill: #fff;
+  font-family: inherit;
+  font-size: 9px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+.tree-move {
+  fill: #d3d8f0;
+  font-family: inherit;
+  font-size: 7px;
+  text-anchor: middle;
+}
+.tree-cut,
+.tree-hidden {
+  font-family: inherit;
+  font-size: 8px;
+  text-anchor: middle;
+}
+.tree-cut {
+  fill: #ff8d8d;
+}
+.tree-hidden {
+  fill: #a7aecb;
+}
+.tree-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 8px;
+  color: #b7c0e8;
+  font-size: 7px;
+  line-height: 1.7;
+}
+.tree-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.legend-dot,
+.legend-square,
+.legend-cut {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #000;
+}
+.legend-dot {
+  border-radius: 50%;
+  background: var(--blue);
+}
+.legend-square {
+  border-radius: 2px;
+  background: var(--red);
+}
+.legend-cut {
+  border-color: var(--yellow);
+  background: var(--red);
+}
+
 /* ---------- MOBILE ---------- */
 @media (max-width: 860px) {
   body {
@@ -606,5 +768,14 @@ button {
   }
   .setup-card {
     padding: 14px 10px 16px;
+  }
+  .tree-panel {
+    padding: 9px;
+  }
+  .tree-controls {
+    align-items: stretch;
+  }
+  .tree-controls .px-btn {
+    flex: 1 1 130px;
   }
 }

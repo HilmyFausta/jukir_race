@@ -1,4 +1,5 @@
 import os
+import json
 import random
 import sys
 import unittest
@@ -43,6 +44,17 @@ class TestEngine(unittest.TestCase):
             self.assertEqual(info["strategy"], engine)
             if engine == "minimax":
                 self.assertEqual(info["cuts"], 0)
+
+    def test_trace_tree_is_json_serializable(self):
+        n = 3
+        mask = mask_of(n, [0, 8], [])
+        pure = Solver(n).trace_search(mask, depth=2, width=3, engine="minimax")
+        alpha_beta = Solver(n).trace_search(mask, depth=2, width=3, engine="alphabeta")
+        json.dumps(pure)
+        json.dumps(alpha_beta)
+        self.assertEqual(pure["cuts"], 0)
+        self.assertGreaterEqual(alpha_beta["cuts"], 0)
+        self.assertTrue(pure["root"]["children"])
 
     def test_ai_finds_forced_win_on_tiny_board(self):
         # 3x3 tanpa obstacle kecuali pojok-pojok -> cukup kecil untuk diselesaikan penuh

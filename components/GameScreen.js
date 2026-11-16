@@ -13,6 +13,7 @@ import {
   shapeOf,
   spriteUrl,
 } from "../lib/game";
+import TreeVisualizer from "./TreeVisualizer";
 
 const Board = dynamic(() => import("./Board"), { ssr: false });
 
@@ -279,6 +280,7 @@ export default function GameScreen({ config, onExit }) {
             </div>
           )}
           {notice && <div className="notice">{notice}</div>}
+          <TreeVisualizer state={game} engine={engine} />
         </div>
 
         <PlayerCard side={SIDES[1]} idx={1} active={game.turn === 1} role={roleOf(1)} count={counts[1]} over={game.over} />

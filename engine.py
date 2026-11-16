@@ -15,6 +15,7 @@ Nilai simpul (sudut pandang pemain yang jalan):
 """
 import random
 import time
+import math
 from collections import namedtuple
 from functools import lru_cache
 
@@ -165,6 +166,108 @@ class Solver:
             if v > best:
                 best = v
         return best
+
+    def trace_search(self, mask, depth=3, width=4, engine="alphabeta", budget=50_000):
+        """Bangun snapshot tree kecil untuk visualisasi pencarian tanpa tabel transposisi."""
+        engine = engine if engine in ("minimax", "alphabeta") else "alphabeta"
+        started = time.perf_counter()
+        clock = 0
+        visited = 0
+        cuts = 0
+        truncated = False
+
+        def move_data(move):
+            return {"r": move.r, "c": move.c, "h": move.h, "w": move.w}
+
+        def json_bound(value):
+            return value if math.isfinite(value) else None
+
+        def visit(current, remaining, alpha, beta, parent_depth, move=None):
+            nonlocal clock, visited, cuts, truncated
+            visited += 1
+            if visited > budget:
+                truncated = True
+                raise BudgetExceeded
+
+            clock += 1
+            node = {
+                "id": f"v{visited}",
+                "depth": parent_depth,
+                "type": "max" if parent_depth % 2 == 0 else "min",
+                "move": move_data(move) if move else None,
+                "alpha": json_bound(alpha),
+                "beta": json_bound(beta),
+                "value": None,
+                "open": clock,
+                "close": None,
+                "children": [],
+                "hidden": 0,
+                "skipped": 0,
+                "cut": False,
+            }
+            moves = self.legal(current)
+            if not moves:
+                node["value"] = -1000 - remaining
+            elif remaining == 0:
+                node["value"] = 0
+            else:
+                best = float("-inf")
+                original_alpha = alpha
+                for index, candidate in enumerate(moves):
+                    child = visit(current | candidate.mask, remaining - 1, -beta, -alpha, parent_depth + 1, candidate)
+                    if len(node["children"]) < width:
+                        node["children"].append(child)
+                    else:
+                        node["hidden"] += 1
+                    value = -child["value"]
+                    best = max(best, value)
+                    alpha = max(alpha, best)
+                    if engine == "alphabeta" and alpha >= beta:
+                        cuts += 1
+                        node["cut"] = True
+                        node["skipped"] = len(moves) - index - 1
+                        break
+                node["value"] = best
+                node["alpha_initial"] = json_bound(original_alpha)
+                node["alpha_final"] = json_bound(alpha)
+            clock += 1
+            node["close"] = clock
+            return node
+
+        root = {
+            "id": "root",
+            "depth": 0,
+            "type": "max",
+            "move": None,
+            "alpha": None,
+            "beta": None,
+            "value": None,
+            "open": 0,
+            "close": None,
+            "children": [],
+            "hidden": 0,
+            "skipped": 0,
+            "cut": False,
+        }
+        try:
+            result = visit(mask, depth, float("-inf"), float("inf"), 0)
+            root.update(result)
+            root["id"] = "root"
+        except BudgetExceeded:
+            root["value"] = None
+            truncated = True
+        root["close"] = clock
+        return {
+            "root": root,
+            "events": clock,
+            "nodes": visited,
+            "cuts": cuts,
+            "depth": depth,
+            "width": width,
+            "engine": engine,
+            "truncated": truncated,
+            "ms": round((time.perf_counter() - started) * 1000),
+        }
 
     def choose(self, mask, last=None, depth=8, use_mirror=False, engine="alphabeta"):
         """Pilih langkah terbaik. `last` = bidak terakhir lawan (dict r,c,h,w) atau None."""
