@@ -1,6 +1,6 @@
 # Jukir Race
 
-Game KKA (Adversarial Search): Indoapril vs Betamart. Next.js + Phaser (frontend), Python/Flask (AI minimax + alpha-beta) di Vercel.
+Game KKA (Adversarial Search): April vs Beth. Next.js + Phaser (frontend), Python/Flask (AI minimax + alpha-beta) di Vercel.
 Aturan dan arsitektur lengkap ada di `PRD.md`.
 
 ## Jalankan lokal

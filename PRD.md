@@ -5,7 +5,7 @@ Proyek KKA - Implementasi Adversarial Search (Minimax + Alpha-Beta Pruning)
 > vertikal/horizontal per agent) sudah ditinggalkan. Aturan yang berlaku adalah normal play.
 
 ## 1. Ringkasan
-Board game turn-based bertema parkiran. Dua jukir sekaligus maskot, **Indoapril (biru)** dan **Betamart (merah)**,
+Board game turn-based bertema parkiran. Dua jukir sekaligus maskot, **April (biru)** dan **Beth (merah)**,
 bergantian menaruh kendaraan di papan n x n. Jukir yang **tidak bisa menaruh kendaraan apa pun saat gilirannya kalah**.
 Terinspirasi dari Domineering, dengan bidak berukuran beragam dan orientasi bebas.
 
@@ -16,7 +16,7 @@ Terinspirasi dari Domineering, dengan bidak berukuran beragam dan orientasi beba
 3. Bidak: **motor 1x2 / 2x1** dan **mobil 1x3 / 3x1**. Pemain bebas memilih ukuran dan orientasi (vertikal/horizontal) tiap giliran.
 4. Jumlah bidak **unlimited** (boleh spam mobil 1x3 sejak awal). Tidak ada jatah, tidak ada tarif/poin.
 5. Bidak tidak boleh tumpang tindih dan tidak boleh keluar papan.
-6. Pemain bergantian. Indoapril (P1, biru) jalan duluan, Betamart (P2, merah) kedua.
+6. Pemain bergantian. April (P1, biru) jalan duluan, Beth (P2, merah) kedua.
 7. **Kondisi kalah:** pemain yang pada gilirannya tidak bisa menaruh bidak apa pun kalah; lawannya menang. Tidak ada skip, tidak ada seri.
    (Karena mobil 1x3 selalu memuat 1x2, kondisi ini sama dengan "tidak ada dua petak kosong yang bersebelahan".)
 
@@ -24,15 +24,15 @@ Terinspirasi dari Domineering, dengan bidak berukuran beragam dan orientasi beba
 | Mode | Keterangan |
 |---|---|
 | AI vs AI | Dua AI beradu, ada tombol Jeda/Lanjut. Cocok untuk demo dan melihat statistik pemangkasan. |
-| Player vs AI | Pemain memilih jadi Indoapril (jalan duluan) atau Betamart. Ada level AI: Mudah / Sedang / Sulit. |
+| Player vs AI | Pemain memilih jadi April (jalan duluan) atau Beth. Ada level AI: Mudah / Sedang / Sulit. |
 | Player vs Player | Dua manusia bergantian di satu device yang sama (bukan multiplayer online). |
 
 ## 4. Alur UI (HP dan laptop sama)
-1. **Layar judul** - Logo Jukir Race, latar split biru vs merah bergaya pixel art dengan tulisan **VS**, maskot Indoapril (kiri) dan Betamart (kanan) muncul
+1. **Layar judul** - Logo Jukir Race, latar parkiran bergaya pixel art dengan tulisan **VS**, maskot April (kiri) dan Beth (kanan) muncul
    dengan animasi (.gif), tombol **PLAY**.
 2. **Layar pilihan** - Pilih mode (AI vs AI / Player vs AI / Player vs Player), ukuran arena n x n (3-8), serta (jika ada AI) sisi yang dimainkan dan level AI.
 3. **Layar game**
-   - Papan paving (Phaser). Obstacle berupa ban, kendaraan berwarna sesuai pemilik: **Indoapril = biru, Betamart = merah**.
+   - Papan paving (Phaser). Obstacle berupa ban, kendaraan berwarna sesuai pemilik: **April = biru, Beth = merah**.
    - **Palet kendaraan** menampilkan keempat bentuk (motor 2x1, motor 1x2, mobil 3x1, mobil 1x3) dengan warna pemain yang sedang jalan.
    - **Preview bayangan abu-abu** saat menaruh (merah bila posisi tidak valid).
      - Laptop: arahkan kursor lalu klik. Tombol **R** memutar orientasi.

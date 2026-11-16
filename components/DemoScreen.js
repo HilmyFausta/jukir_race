@@ -17,7 +17,7 @@ function DemoCard({ engine, state, info, total, thinking }) {
     <article className={`demo-card ${meta.color}`}>
       <div className="demo-card-title">{meta.label}</div>
       <div className="demo-status">
-        {state.over ? `${state.winner === 0 ? "INDOAPRIL" : "BETAMART"} MENANG` : thinking ? "BERPIKIR..." : `Giliran ${state.turn === 0 ? "Indoapril" : "Betamart"}`}
+        {state.over ? `${state.winner === 0 ? "APRIL" : "BETH"} MENANG` : thinking ? "BERPIKIR..." : `Giliran ${state.turn === 0 ? "April" : "Beth"}`}
       </div>
       <div className="demo-board">
         <Board state={state} preview={null} onHover={() => {}} onTap={() => {}} />

@@ -9,13 +9,13 @@ export default function TitleScreen({ onPlay }) {
 
       <div className="title-stage">
         <div className="mascot left">
-          <img src="/assets/char/indoapril.gif" alt="Indoapril" />
-          <div className="nameplate blue">INDOAPRIL</div>
+          <img src="/assets/char/indoapril.gif" alt="April" />
+          <img className="nameplate-logo" src="/assets/April_512.png" alt="April" />
         </div>
         <div className="vs">VS</div>
         <div className="mascot right">
-          <img src="/assets/char/betamart.gif" alt="Betamart" />
-          <div className="nameplate red">BETAMART</div>
+          <img src="/assets/char/betamart.gif" alt="Beth" />
+          <img className="nameplate-logo" src="/assets/Beth_512.png" alt="Beth" />
         </div>
       </div>
 
