@@ -533,6 +533,7 @@ button {
 
 /* ---------- SEARCH TREE ---------- */
 .tree-panel {
+  grid-column: 1 / -1;
   width: 100%;
   padding: 12px;
   background: #171b32;
@@ -593,10 +594,9 @@ button {
   margin: 12px 0 3px;
   accent-color: var(--yellow);
 }
-.tree-scroll {
+.tree-canvas {
   width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
   margin-top: 8px;
   padding: 8px;
   background: #0c1021;
@@ -605,7 +605,10 @@ button {
 }
 .tree-svg {
   display: block;
-  min-width: 720px;
+  width: 100%;
+  height: clamp(220px, 30vw, 390px);
+  min-width: 0;
+  max-width: 100%;
   background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   background-size: 18px 18px;
 }
@@ -666,6 +669,11 @@ button {
   color: #b7c0e8;
   font-size: 7px;
   line-height: 1.7;
+}
+.tree-loading {
+  color: var(--yellow);
+  font-size: 7px;
+  animation: blink 0.9s steps(2) infinite;
 }
 .tree-legend span {
   display: inline-flex;

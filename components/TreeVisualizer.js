@@ -83,8 +83,8 @@ function TreeSvg({ root, step }) {
   walk(root);
 
   return (
-    <div className="tree-scroll">
-      <svg className="tree-svg" width={layout.width} height={layout.height} viewBox={`0 0 ${layout.width} ${layout.height}`} role="img" aria-label="Pohon pencarian AI">
+    <div className="tree-canvas">
+      <svg className="tree-svg" viewBox={`0 0 ${layout.width} ${layout.height}`} role="img" aria-label="Pohon pencarian AI">
         {edges}
         {nodes}
       </svg>
@@ -105,7 +105,7 @@ export default function TreeVisualizer({ state, engine }) {
     setData(null);
     setStep(0);
     setPlaying(false);
-  }, [state]);
+  }, [state, engine]);
 
   useEffect(() => {
     if (!playing || !data) return undefined;
@@ -117,25 +117,39 @@ export default function TreeVisualizer({ state, engine }) {
     return () => clearTimeout(timer);
   }, [playing, step, data]);
 
-  const run = async () => {
-    setBusy(true);
-    setError("");
-    setPlaying(false);
-    try {
-      const response = await fetch("/api/game/visualize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ state, depth, width, engine }),
-      });
-      if (!response.ok) throw new Error("Gagal mengambil data tree.");
-      const result = await response.json();
-      setData(result);
-      setStep(result.events);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setBusy(false);
-    }
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      setBusy(true);
+      setError("");
+      try {
+        const response = await fetch("/api/game/visualize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ state, depth, width, engine }),
+        });
+        if (!response.ok) throw new Error("Gagal memperbarui visualisasi.");
+        const result = await response.json();
+        if (cancelled) return;
+        setData(result);
+        setStep(0);
+        setPlaying(true);
+      } catch (e) {
+        if (!cancelled) setError(e.message);
+      } finally {
+        if (!cancelled) setBusy(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [state, depth, width, engine]);
+
+  const resetPlayback = () => {
+    if (!data) return;
+    setStep(0);
+    setPlaying(true);
   };
 
   return (
@@ -161,17 +175,16 @@ export default function TreeVisualizer({ state, engine }) {
             {[3, 4, 5, 6].map((value) => <option key={value} value={value}>{value}</option>)}
           </select>
         </label>
-        <button className="px-btn small primary" onClick={run} disabled={busy}>
-          {busy ? "MENGHITUNG..." : "VISUALISASIKAN"}
-        </button>
         {data && (
           <button className="px-btn small" onClick={() => {
-            if (step >= data.events) setStep(0);
-            setPlaying((value) => !value);
+            if (playing) setPlaying(false);
+            else if (step >= data.events) resetPlayback();
+            else setPlaying(true);
           }}>
-            {playing ? "BERHENTI" : "PUTAR"}
+            {playing ? "JEDA" : "PUTAR LAGI"}
           </button>
         )}
+        {busy && <span className="tree-loading">MEMPERBARUI...</span>}
       </div>
 
       {data && (
@@ -194,7 +207,7 @@ export default function TreeVisualizer({ state, engine }) {
           </div>
         </>
       )}
-      {!data && <p className="tree-empty">Tekan VISUALISASIKAN untuk melihat pencarian dari posisi saat ini.</p>}
+      {!data && <p className="tree-empty">Visualisasi pencarian sedang disiapkan...</p>}
       {error && <p className="notice">{error}</p>}
     </section>
   );
