@@ -68,6 +68,7 @@ export default function DemoScreen({ config, onExit }) {
     let cancelled = false;
     const timer = setTimeout(async () => {
       const levelConfig = LEVELS[level] || LEVELS.sedang;
+      const demoDepth = Math.min(levelConfig.depth, n <= 4 ? 3 : 2);
       const active = games.map((game) => !game.over);
       setThinking(active);
       try {
@@ -79,7 +80,7 @@ export default function DemoScreen({ config, onExit }) {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 state: { n: game.n, obstacles: game.obstacles, pieces: game.pieces, turn: game.turn },
-                depth: levelConfig.depth,
+                depth: demoDepth,
                 engine: ENGINES[index].key,
                 unlimited: true,
               }),
@@ -120,7 +121,7 @@ export default function DemoScreen({ config, onExit }) {
       </div>
       <div className="demo-heading px-box">
         <h1>PERBANDINGAN ENGINE</h1>
-        <p>Dua papan memakai obstacle dan posisi awal yang identik. Waktu yang ditampilkan adalah waktu murni pencarian sampai depth selesai.</p>
+        <p>Dua papan memakai obstacle dan posisi awal yang identik. Waktu yang ditampilkan adalah waktu murni pencarian sampai depth {n <= 4 ? 3 : 2} selesai.</p>
       </div>
       {notice && <div className="notice">{notice}</div>}
       <div className="demo-grid">
