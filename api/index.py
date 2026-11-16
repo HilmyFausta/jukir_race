@@ -37,7 +37,8 @@ def new_game():
 @app.route('/api/game/ai-move', methods=['POST'])
 def ai_move():
     """
-    Body: {state: {n, obstacles:[idx], pieces:[{r,c,h,w,p}], turn}, depth, time_limit, mirror}
+    Body: {state: {n, obstacles:[idx], pieces:[{r,c,h,w,p}], turn},
+           depth, time_limit, mirror, engine: "minimax"|"alphabeta"}
     Return: {move: {r,c,h,w}, info: {...}}
     """
     data = request.get_json(silent=True) or {}
@@ -46,6 +47,9 @@ def ai_move():
     obstacles = state.get('obstacles', [])
     pieces = state.get('pieces', [])
     depth = clamp(data.get('depth', 8), 1, 20, 8)
+    engine = data.get('engine', 'alphabeta')
+    if engine not in ('minimax', 'alphabeta'):
+        engine = 'alphabeta'
     try:
         time_limit = max(0.3, min(float(data.get('time_limit', 3.5)), 8.0))
     except (TypeError, ValueError):
@@ -57,7 +61,7 @@ def ai_move():
 
     solver = Solver(n, budget=400_000, time_limit=time_limit)
     last = pieces[-1] if pieces else None
-    move, info = solver.choose(mask, last, depth, bool(data.get('mirror', False)))
+    move, info = solver.choose(mask, last, depth, bool(data.get('mirror', False)), engine)
     return jsonify({"move": {"r": move.r, "c": move.c, "h": move.h, "w": move.w}, "info": info})
 
 

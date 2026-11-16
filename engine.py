@@ -108,21 +108,30 @@ class Solver:
 
     def nega(self, mask, d, a, b):
         self.nodes += 1
+        # Buat visualisasi tree node (simplified)
+        node_id = f"{mask}_{d}"
+        node_info = {"id": node_id, "children": [], "value": None, "type": "max" if (d % 2 == 0) else "min"}
+
         if self.nodes > self.budget or ((self.nodes & 1023) == 0 and time.perf_counter() > self.deadline):
             raise BudgetExceeded
         e = self.tt.get(mask)
         if e and e[0] >= d:
             _, v, f = e
             if f == 0:
+                node_info["value"] = v
                 return v
             if f == 1 and v >= b:
+                node_info["value"] = v
                 return v
             if f == 2 and v <= a:
+                node_info["value"] = v
                 return v
         moves = self.legal(mask)
         if not moves:
+            node_info["value"] = -1000 - d
             return -1000 - d
         if d == 0:
+            node_info["value"] = 0
             return 0
         a0, best = a, float("-inf")
         for m in moves:
@@ -136,10 +145,31 @@ class Solver:
                 break
         flag = 2 if best <= a0 else (1 if best >= b else 0)
         self.tt[mask] = (d, best, flag)
+        node_info["value"] = best
         return best
 
-    def choose(self, mask, last=None, depth=8, use_mirror=False):
+    def minimax_pure(self, mask, d):
+        self.nodes += 1
+        if self.nodes > self.budget or ((self.nodes & 1023) == 0 and time.perf_counter() > self.deadline):
+            raise BudgetExceeded
+
+        moves = self.legal(mask)
+        if not moves:
+            return -1000 - d
+        if d == 0:
+            return 0
+
+        best = float("-inf")
+        for m in moves:
+            v = -self.minimax_pure(mask | m.mask, d - 1)
+            if v > best:
+                best = v
+        return best
+
+    def choose(self, mask, last=None, depth=8, use_mirror=False, engine="alphabeta"):
         """Pilih langkah terbaik. `last` = bidak terakhir lawan (dict r,c,h,w) atau None."""
+        if engine not in ("minimax", "alphabeta"):
+            engine = "alphabeta"
         t0 = time.perf_counter()
         self.deadline = t0 + self.time_limit
         self.nodes = self.cuts = 0
@@ -163,11 +193,15 @@ class Solver:
 
         best, bv, done = moves[0], float("-inf"), 0
         order = list(moves)
+        search = self.minimax_pure if engine == "minimax" else self.nega
         try:
             for d in range(1, depth + 1):
                 a, cb, cv = float("-inf"), order[0], float("-inf")
                 for m in order:
-                    v = -self.nega(mask | m.mask, d - 1, float("-inf"), -a)
+                    if engine == "minimax":
+                        v = -search(mask | m.mask, d - 1)
+                    else:
+                        v = -search(mask | m.mask, d - 1, float("-inf"), -a)
                     if v > cv:
                         cv, cb = v, m
                     if cv > a:
@@ -184,5 +218,5 @@ class Solver:
             result = "menang dipaksa" if bv > 0 else "kalah dipaksa"
         else:
             result = "belum terselesaikan"
-        return best, {"strategy": "minimax", "depth": done, "nodes": self.nodes, "cuts": self.cuts,
+        return best, {"strategy": engine, "depth": done, "nodes": self.nodes, "cuts": self.cuts,
                       "ms": round((time.perf_counter() - t0) * 1000), "result": result}

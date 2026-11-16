@@ -34,6 +34,16 @@ class TestEngine(unittest.TestCase):
         self.assertFalse(move.mask & mask)
         self.assertGreaterEqual(info["nodes"], 1)
 
+    def test_engines_return_legal_moves(self):
+        n = 4
+        mask = mask_of(n, [0, 5], [])
+        for engine in ("minimax", "alphabeta"):
+            move, info = Solver(n, time_limit=2).choose(mask, None, depth=3, engine=engine)
+            self.assertFalse(move.mask & mask)
+            self.assertEqual(info["strategy"], engine)
+            if engine == "minimax":
+                self.assertEqual(info["cuts"], 0)
+
     def test_ai_finds_forced_win_on_tiny_board(self):
         # 3x3 tanpa obstacle kecuali pojok-pojok -> cukup kecil untuk diselesaikan penuh
         n = 3

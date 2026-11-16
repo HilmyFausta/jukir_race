@@ -32,7 +32,7 @@ function PlayerCard({ side, idx, active, role, count, over }) {
 }
 
 export default function GameScreen({ config, onExit }) {
-  const { mode, n, humanSide, level } = config;
+  const { mode, n, humanSide, level, engine = "alphabeta" } = config;
   const [game, setGame] = useState(null);
   const [gid, setGid] = useState(0);
   const [sel, setSel] = useState({ type: "motor", o: "h" });
@@ -92,6 +92,7 @@ export default function GameScreen({ config, onExit }) {
             state: { n: game.n, obstacles: game.obstacles, pieces: game.pieces, turn: game.turn },
             depth: lv.depth,
             time_limit: lv.time,
+            engine,
           }),
         });
         if (!res.ok) throw new Error("bad status");
@@ -263,7 +264,13 @@ export default function GameScreen({ config, onExit }) {
 
           {info && (
             <div className="ai-info">
-              <strong>{info.strategy === "mirror" ? "Strategi cermin" : "Minimax + Alpha-Beta"}</strong>
+              <strong>
+                {info.strategy === "mirror"
+                  ? "Strategi cermin"
+                  : info.strategy === "minimax"
+                    ? "Minimax murni"
+                    : "Minimax + Alpha-Beta"}
+              </strong>
               {info.strategy !== "mirror" && (
                 <span>
                   kedalaman {info.depth} &middot; {fmt(info.nodes)} node &middot; {fmt(info.cuts)} pemangkasan &middot; {info.ms} ms &middot; {info.result}

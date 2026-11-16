@@ -12,6 +12,7 @@ export default function SetupScreen({ initial, onStart, onBack }) {
   const [n, setN] = useState(initial?.n || 6);
   const [humanSide, setHumanSide] = useState(initial?.humanSide ?? 0);
   const [level, setLevel] = useState(initial?.level || "sedang");
+  const [engine, setEngine] = useState(initial?.engine || "alphabeta");
 
   const hasAI = mode !== "pvp";
 
@@ -68,6 +69,15 @@ export default function SetupScreen({ initial, onStart, onBack }) {
 
         {hasAI && (
           <>
+            <h2 className="setup-title">ENGINE AI</h2>
+            <div className="level-grid">
+              <button className={`px-btn ${engine === "alphabeta" ? "on" : ""}`} onClick={() => setEngine("alphabeta")}>
+                MINIMAX + ALPHA-BETA
+              </button>
+              <button className={`px-btn ${engine === "minimax" ? "on" : ""}`} onClick={() => setEngine("minimax")}>
+                MINIMAX MURNI
+              </button>
+            </div>
             <h2 className="setup-title">LEVEL AI</h2>
             <div className="level-grid">
               {Object.entries(LEVELS).map(([k, v]) => (
@@ -83,7 +93,7 @@ export default function SetupScreen({ initial, onStart, onBack }) {
           <button className="px-btn" onClick={onBack}>
             KEMBALI
           </button>
-          <button className="px-btn primary" onClick={() => onStart({ mode, n, humanSide, level })}>
+          <button className="px-btn primary" onClick={() => onStart({ mode, n, humanSide, level, engine })}>
             MULAI
           </button>
         </div>
