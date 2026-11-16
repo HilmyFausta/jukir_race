@@ -18,6 +18,7 @@ export default function SetupScreen({ initial, onStart, onBack }) {
 
   return (
     <div className="setup-screen">
+      <div className="setup-background" />
       <div className="setup-glow blue" />
       <div className="setup-glow red" />
 
