@@ -64,31 +64,41 @@ export default function DemoScreen({ config, onExit }) {
   }, [newDemo]);
 
   useEffect(() => {
-    if (!games[0] || !games[1] || games.every((game) => game.over)) return undefined;
+    if (!games[0] || !games[1] || games.every((game) => game.over) || thinking.some(Boolean)) return undefined;
     let cancelled = false;
     const timer = setTimeout(async () => {
       const levelConfig = LEVELS[level] || LEVELS.sedang;
       const active = games.map((game) => !game.over);
       setThinking(active);
       try {
-        const results = await Promise.all(games.map(async (game, index) => {
-          if (game.over) return null;
-          const response = await fetch("/api/game/ai-move", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              state: { n: game.n, obstacles: game.obstacles, pieces: game.pieces, turn: game.turn },
-              depth: levelConfig.depth,
-              time_limit: levelConfig.time,
-              engine: ENGINES[index].key,
-            }),
-          });
-          if (!response.ok) throw new Error(`${ENGINES[index].label} gagal menghitung langkah.`);
-          return response.json();
-        }));
+        const tasks = games.map(async (game, index) => {
+          if (game.over) return { index, result: null, error: null };
+          try {
+            const response = await fetch("/api/game/ai-move", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                state: { n: game.n, obstacles: game.obstacles, pieces: game.pieces, turn: game.turn },
+                depth: levelConfig.depth,
+                engine: ENGINES[index].key,
+                unlimited: true,
+              }),
+            });
+            if (!response.ok) throw new Error(`${ENGINES[index].label} gagal menghitung langkah.`);
+            return { index, result: await response.json(), error: null };
+          } catch (error) {
+            return { index, result: null, error };
+          }
+        });
+        const results = await Promise.all(tasks);
         if (cancelled) return;
-        setInfos((current) => current.map((info, index) => results[index]?.info || info));
-        setGames((current) => current.map((game, index) => results[index] ? applyMove(game, results[index].move) : game));
+        const failed = results.find((item) => item.error);
+        if (failed) setNotice(failed.error.message);
+        results.forEach(({ index, result }) => {
+          if (!result) return;
+          setInfos((current) => current.map((info, infoIndex) => infoIndex === index ? result.info : info));
+          setGames((current) => current.map((game, gameIndex) => gameIndex === index ? applyMove(game, result.move) : game));
+        });
       } catch (error) {
         if (!cancelled) setNotice(error.message);
       } finally {
@@ -99,7 +109,7 @@ export default function DemoScreen({ config, onExit }) {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [games, level, run]);
+  }, [games, level, run, thinking]);
 
   return (
     <div className="game-screen demo-screen">
@@ -110,7 +120,7 @@ export default function DemoScreen({ config, onExit }) {
       </div>
       <div className="demo-heading px-box">
         <h1>PERBANDINGAN ENGINE</h1>
-        <p>Dua papan memakai obstacle dan posisi awal yang identik. Keduanya berjalan sendiri agar jumlah node dan waktu dapat dibandingkan.</p>
+        <p>Dua papan memakai obstacle dan posisi awal yang identik. Waktu yang ditampilkan adalah waktu murni pencarian sampai depth selesai.</p>
       </div>
       {notice && <div className="notice">{notice}</div>}
       <div className="demo-grid">

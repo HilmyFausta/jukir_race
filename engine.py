@@ -274,7 +274,7 @@ class Solver:
         if engine not in ("minimax", "alphabeta"):
             engine = "alphabeta"
         t0 = time.perf_counter()
-        self.deadline = t0 + self.time_limit
+        self.deadline = float("inf") if self.time_limit is None else t0 + self.time_limit
         self.nodes = self.cuts = 0
         self.tt = {}
         moves = self.legal(mask)

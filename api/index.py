@@ -50,10 +50,13 @@ def ai_move():
     engine = data.get('engine', 'alphabeta')
     if engine not in ('minimax', 'alphabeta'):
         engine = 'alphabeta'
-    try:
-        time_limit = max(0.3, min(float(data.get('time_limit', 3.5)), 8.0))
-    except (TypeError, ValueError):
-        time_limit = 3.5
+    if data.get('unlimited', False):
+        time_limit = None
+    else:
+        try:
+            time_limit = max(0.3, min(float(data.get('time_limit', 3.5)), 8.0))
+        except (TypeError, ValueError):
+            time_limit = 3.5
 
     mask = mask_of(n, obstacles, pieces)
     if not legal_moves(n, mask):
