@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { LEVELS, applyMove } from "../lib/game";
 
@@ -39,6 +39,7 @@ export default function DemoScreen({ config, onExit }) {
   const [thinking, setThinking] = useState([false, false]);
   const [notice, setNotice] = useState("");
   const [run, setRun] = useState(0);
+  const inFlight = useRef(false);
 
   const newDemo = useCallback(async () => {
     setGames([null, null]);
@@ -64,8 +65,9 @@ export default function DemoScreen({ config, onExit }) {
   }, [newDemo]);
 
   useEffect(() => {
-    if (!games[0] || !games[1] || games.every((game) => game.over) || thinking.some(Boolean)) return undefined;
+    if (!games[0] || !games[1] || games.every((game) => game.over) || inFlight.current) return undefined;
     let cancelled = false;
+    inFlight.current = true;
     const timer = setTimeout(async () => {
       const levelConfig = LEVELS[level] || LEVELS.sedang;
       const demoDepth = Math.min(levelConfig.depth, n <= 4 ? 3 : 2);
@@ -104,13 +106,15 @@ export default function DemoScreen({ config, onExit }) {
         if (!cancelled) setNotice(error.message);
       } finally {
         if (!cancelled) setThinking([false, false]);
+        inFlight.current = false;
       }
     }, 500);
     return () => {
       cancelled = true;
       clearTimeout(timer);
+      inFlight.current = false;
     };
-  }, [games, level, run, thinking]);
+  }, [games, level, run]);
 
   return (
     <div className="game-screen demo-screen">
