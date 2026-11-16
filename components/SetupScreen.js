@@ -77,6 +77,9 @@ export default function SetupScreen({ initial, onStart, onBack }) {
               <button className={`px-btn ${engine === "minimax" ? "on" : ""}`} onClick={() => setEngine("minimax")}>
                 MINIMAX MURNI
               </button>
+              <button className={`px-btn ${engine === "demo" ? "on" : ""}`} onClick={() => setEngine("demo")}>
+                MODE DEMO: BANDINGKAN
+              </button>
             </div>
             <h2 className="setup-title">LEVEL AI</h2>
             <div className="level-grid">

@@ -102,7 +102,6 @@ export default function TreeVisualizer({ state, engine }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    setData(null);
     setStep(0);
     setPlaying(false);
   }, [state, engine]);

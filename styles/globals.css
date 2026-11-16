@@ -338,6 +338,7 @@ button {
   min-height: 100dvh;
   padding: 10px 10px 18px;
   background: repeating-conic-gradient(#171c33 0 25%, #12162b 0 50%) 0 0 / 16px 16px;
+  overflow-anchor: none;
 }
 .game-top {
   max-width: 1100px;
@@ -535,6 +536,7 @@ button {
 .tree-panel {
   grid-column: 1 / -1;
   width: 100%;
+  min-height: 360px;
   padding: 12px;
   background: #171b32;
   border-color: #000;
@@ -597,6 +599,7 @@ button {
 .tree-canvas {
   width: 100%;
   overflow: hidden;
+  overflow-anchor: none;
   margin-top: 8px;
   padding: 8px;
   background: #0c1021;
@@ -606,11 +609,85 @@ button {
 .tree-svg {
   display: block;
   width: 100%;
-  height: clamp(220px, 30vw, 390px);
+  height: clamp(250px, 30vw, 390px);
   min-width: 0;
   max-width: 100%;
   background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   background-size: 18px 18px;
+}
+
+/* ---------- ENGINE COMPARISON DEMO ---------- */
+.demo-heading {
+  max-width: 1100px;
+  margin: 0 auto 14px;
+  padding: 12px 14px;
+  text-align: center;
+}
+.demo-heading h1 {
+  margin: 0;
+  color: var(--yellow);
+  font-size: clamp(12px, 2vw, 18px);
+}
+.demo-heading p {
+  margin: 8px auto 0;
+  max-width: 720px;
+  font-size: 8px;
+  line-height: 1.8;
+  opacity: 0.85;
+}
+.demo-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.demo-card {
+  min-width: 0;
+  padding: 10px;
+  background: var(--panel);
+  border: 4px solid #000;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.45);
+}
+.demo-card.blue {
+  border-color: var(--blue);
+}
+.demo-card.red {
+  border-color: var(--red);
+}
+.demo-card-title {
+  color: var(--yellow);
+  font-size: clamp(8px, 1.2vw, 12px);
+  text-align: center;
+  line-height: 1.6;
+}
+.demo-status {
+  min-height: 26px;
+  margin: 6px 0;
+  padding: 6px;
+  background: #0d1020;
+  font-size: 8px;
+  text-align: center;
+}
+.demo-board {
+  width: min(100%, 520px);
+  margin: 0 auto;
+  border: 6px solid #b7a98e;
+  box-shadow: 0 0 0 3px #000;
+  background: #9b957f;
+}
+.demo-board .board-host {
+  width: 100%;
+}
+.demo-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+  margin-top: 10px;
+  color: #c5cbea;
+  font-size: 7px;
+  line-height: 1.6;
+  text-align: center;
 }
 .tree-edge {
   stroke: #72799d;
@@ -764,6 +841,10 @@ button {
   }
   .play-btn {
     padding: 14px 36px;
+  }
+  .demo-grid {
+    grid-template-columns: 1fr;
+    max-width: 560px;
   }
 }
 

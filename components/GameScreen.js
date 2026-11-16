@@ -14,6 +14,7 @@ import {
   spriteUrl,
 } from "../lib/game";
 import TreeVisualizer from "./TreeVisualizer";
+import DemoScreen from "./DemoScreen";
 
 const Board = dynamic(() => import("./Board"), { ssr: false });
 
@@ -34,6 +35,7 @@ function PlayerCard({ side, idx, active, role, count, over }) {
 
 export default function GameScreen({ config, onExit }) {
   const { mode, n, humanSide, level, engine = "alphabeta" } = config;
+  if (engine === "demo") return <DemoScreen config={config} onExit={onExit} />;
   const [game, setGame] = useState(null);
   const [gid, setGid] = useState(0);
   const [sel, setSel] = useState({ type: "motor", o: "h" });
