@@ -13,6 +13,7 @@ export default function SetupScreen({ initial, onStart, onBack }) {
   const [humanSide, setHumanSide] = useState(initial?.humanSide ?? 0);
   const [level, setLevel] = useState(initial?.level || "sedang");
   const [engine, setEngine] = useState(initial?.engine || "alphabeta");
+  const [boxOpen, setBoxOpen] = useState(false);
 
   const hasAI = mode !== "pvp";
 
@@ -22,8 +23,23 @@ export default function SetupScreen({ initial, onStart, onBack }) {
       <div className="setup-glow blue" />
       <div className="setup-glow red" />
 
-      <div className="px-box setup-card">
-        <h2 className="setup-title">PILIH MODE</h2>
+      <div className={`px-box setup-card ${boxOpen ? "is-open" : ""}`}>
+        <div className="cabinet-door cabinet-door-left" aria-hidden="true" />
+        <div className="cabinet-door cabinet-door-right" aria-hidden="true" />
+        <button
+          className="cabinet-open-button"
+          type="button"
+          onClick={() => setBoxOpen((open) => !open)}
+          aria-expanded={boxOpen}
+          aria-label={boxOpen ? "Tutup panel menu game" : "Buka menu game"}
+        >
+          <span className="cabinet-warning">!</span>
+          <strong>{boxOpen ? "TUTUP PANEL" : "BUKA MENU GAME"}</strong>
+          <small>{boxOpen ? "KLIK UNTUK MENUTUP" : "KLIK UNTUK MEMILIH MODE"}</small>
+        </button>
+
+        <div className="setup-content">
+          <h2 className="setup-title">PILIH MODE</h2>
         <div className="mode-grid">
           {MODES.map((m) => (
             <button key={m.key} className={`px-btn mode-btn ${mode === m.key ? "on" : ""}`} onClick={() => setMode(m.key)}>
@@ -100,6 +116,7 @@ export default function SetupScreen({ initial, onStart, onBack }) {
           <button className="px-btn primary" onClick={() => onStart({ mode, n, humanSide, level, engine })}>
             MULAI
           </button>
+        </div>
         </div>
       </div>
     </div>
