@@ -1015,6 +1015,21 @@ button {
   }
 }
 
+@media (max-width: 600px) and (pointer: coarse) and (orientation: portrait) {
+  :root {
+    --mobile-logo-x: 50%;
+    --mobile-logo-y: 10px;
+    --mobile-logo-size: 260px;
+    --mobile-mascot-size: 125px;
+    --mobile-mascot-y: 520px;
+    --mobile-left-x: 10px;
+    --mobile-right-x: 10px;
+    --mobile-vs-y: 420px;
+    --mobile-vs-size: 52px;
+    --mobile-play-y: 650px;
+  }
+}
+
 @media (max-width: 860px) {
   body {
     font-size: 11px;
