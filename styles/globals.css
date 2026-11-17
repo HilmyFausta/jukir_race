@@ -1020,13 +1020,13 @@ button {
     --mobile-logo-x: 50%;
     --mobile-logo-y: 10px;
     --mobile-logo-size: 260px;
-    --mobile-mascot-size: 125px;
-    --mobile-mascot-y: 520px;
+    --mobile-mascot-size: 140px;
+    --mobile-mascot-y: 150px;
     --mobile-left-x: 10px;
     --mobile-right-x: 10px;
     --mobile-vs-y: 420px;
-    --mobile-vs-size: 52px;
-    --mobile-play-y: 650px;
+    --mobile-vs-size: 40px;
+    --mobile-play-y: 600px;
   }
 }
 
