@@ -38,6 +38,36 @@ button {
   font-family: inherit;
 }
 
+.sound-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  color: #e8edf0;
+  background: #182126;
+  border: 3px solid #050708;
+  box-shadow: inset 3px 3px 0 #465258, inset -3px -3px 0 #0b0e10, 3px 3px 0 rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  font-size: 8px;
+}
+.sound-toggle span {
+  color: #ff6a62;
+  font-size: 14px;
+}
+.sound-toggle.on {
+  color: #102b17;
+  background: #55d85b;
+  border-color: #123d1a;
+  box-shadow: inset 3px 3px 0 #a0ff82, inset -3px -3px 0 #249c32, 3px 3px 0 rgba(0, 0, 0, 0.4);
+}
+.sound-toggle.on span {
+  color: #126a25;
+}
+
 /* ---------- komponen dasar pixel ---------- */
 .px-box {
   background: var(--panel);

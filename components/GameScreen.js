@@ -15,6 +15,7 @@ import {
 } from "../lib/game";
 import TreeVisualizer from "./TreeVisualizer";
 import DemoScreen from "./DemoScreen";
+import { sound } from "../lib/sound";
 
 const Board = dynamic(() => import("./Board"), { ssr: false });
 
@@ -110,7 +111,10 @@ export default function GameScreen({ config, onExit }) {
         setAiInfo(null);
         setNotice("AI backend gagal, memakai langkah acak sementara.");
       }
-      if (move) setGame((g) => (g && !cancelled ? applyMove(g, move) : g));
+      if (move) {
+        sound.play("move");
+        setGame((g) => (g && !cancelled ? applyMove(g, move) : g));
+      }
     }, mode === "avai" ? 700 : 450);
     return () => {
       cancelled = true;
@@ -132,6 +136,7 @@ export default function GameScreen({ config, onExit }) {
   const place = useCallback(
     (m) => {
       if (!m || !m.valid) return;
+      sound.play("move");
       setGame((g) => applyMove(g, { r: m.r, c: m.c, h: m.h, w: m.w }));
       setHoverCell(null);
     },

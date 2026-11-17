@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { applyMove } from "../lib/game";
+import { sound } from "../lib/sound";
 
 const Board = dynamic(() => import("./Board"), { ssr: false });
 
@@ -110,6 +111,7 @@ export default function DemoScreen({ config, onExit }) {
           if (!result) return;
           setInfos((current) => current.map((info, infoIndex) => infoIndex === index ? result.info : info));
           setTotals((current) => current.map((total, totalIndex) => totalIndex === index ? total + result.info.ms : total));
+          sound.play("move");
           setGames((current) => current.map((game, gameIndex) => gameIndex === index ? applyMove(game, result.move) : game));
         }));
       } catch (error) {
